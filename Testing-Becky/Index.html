@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="lib/chessboardjs/css/chessboard-0.3.0.css">
+    <!-- <link rel="stylesheet" href="style.css"> -->
+</head>
+
+<body>
+    <!-- Chessboard -->
+    <div id="chessboard" style="width: 400px"></div>
+
+    <!-- Game Options -->
+    <div id="gameOptions"><br>
+        <input type="checkbox" id="playerColour" onclick="updateGameOptions()"><label for="playerColour">Play as
+            Black</label>
+<br><br>
+        <button onclick="resetGame()">Restart</button>
+        <br> <br>
+        <select name="depth" id="depth">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+    </div>
+<br>
+    <div>
+        Board Value: <span id="boardScore">0</span><br>
+        Moves Evaluated: <span id="moveEvaluation">0</span><br>
+        Time Spent Evaluating: <span id="timeEvaluation">0</span>
+    </div>
+
+
+    <!-- Scripts -->
+    <script src="lib/jquery/jquery-3.2.1.min.js"></script>
+    <script src="lib/chessboardjs/js/chess.js"></script>
+    <script src="lib/chessboardjs/js/chessboard-0.3.0.js"></script>
+    <script src="chessGame.js"></script>
+</body>
+
+</html>
