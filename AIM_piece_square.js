@@ -100,12 +100,12 @@ var king_white_eval =
 var king_black_eval = reverse_array(king_white_eval);
 
 var getPieceVal = function (piece , x, y) {
-{
+
     if (piece === null)
     {
         return 0;
     }
-}
+
 
     var getAbsoluteVal = function (piece , is_white, x, y)
     {
@@ -135,7 +135,7 @@ var getPieceVal = function (piece , x, y) {
         }
         throw "Piece Type Unknown: " + piece.type;    
     };
-
-    var absolute_value = getAbsoluteVal(piece, piece.color === 'z', x, y);
-    return piece.color === 'z' ? absolute_value : -absolute_value;
+    
+    var absolute_value = getAbsoluteVal(piece, piece.color === 'w', x, y);
+    return piece.color === 'w' ? absolute_value : -absolute_value;
 };

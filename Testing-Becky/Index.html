@@ -16,10 +16,17 @@
         <input type="checkbox" id="playerColour" onclick="updateGameOptions()">
         <label for="playerColour">Play as Black<label for="playerColour"></label>
             <br><br>
+            <input type="checkbox" id="minimax"><label for="minimax">Activate Minimax Algorithm</label>
+            <br><br>
+            <input type="checkbox" id="alphaBeta"><label for="alphaBeta">Activate Alpha-Beta Optimisation</label>
+            <br><br>
+            <input type="checkbox" id="pieceSquare"><label for="pieceSquare">Activate Piece-Squares</label>
+            <br><br>
             <input type="checkbox" id="activateAi"><label for="activateAi"> Play against Stockfish</label>
             <br><br>
             <button onclick="resetGame()">Restart</button>
             <br> <br>
+            Algorithm Depth
             <select name="depth" id="depth">
                 <option value="1">1</option>
                 <option value="2">2</option>
@@ -74,7 +81,7 @@
         </select>
         <br>
         Games to Test
-        <input type="number" id="gameTest" value="10">
+        <input type="number" id="gameTest" value="10" onclick="updateTestCount()">
 
 
         <button onclick="testing()">Start Testing</button><br>
@@ -89,6 +96,7 @@
     <script src="lib/chessboardjs/js/chess.js"></script>
     <script src="lib/chessboardjs/js/chessboard-0.3.0.js"></script>
     <script src="chessGame.js"></script>
+    <script src="../AIM_piece_square.js"></script>
 </body>
 
 </html>
