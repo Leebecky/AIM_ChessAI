@@ -1,3 +1,122 @@
+//? Retrieve Scripts
+$.getScript("../AIM_piece_square.js", function () {
+    console.log("Script loaded but not necessarily executed.");
+});
+
+//? Stockfish
+var stockfish = new Worker('js/stockfish.js');
+var mode = "human";
+var startTest;
+
+function get_moves() {
+    var moves = '';
+    var history = chessGame.history({ verbose: true });
+
+    for (var i = 0; i < history.length; ++i) {
+        var move = history[i];
+        moves += ' ' + move.from + move.to + (move.promotion ? move.promotion : '');
+    }
+
+    return moves;
+}
+
+// var gamesToTest = 2;
+function testing() {
+    startTest = new Date().getTime();
+    mode = "ai";
+    // var difficulty = $("#stockfish").val();
+    // var testingResults = $("#testingResults");
+    // testingResults.text(testingResults.text() + difficulty + "\n");
+
+    // while (gamesToTest != 0) {
+    aiMove();
+
+    // if (chessGame.game_over()) {
+    // testingReset(stockfishIsWhite);
+    // gamesToTest--;
+    // }
+    // }
+}
+
+//? Reset Game during Testing
+function testingReset(stockfishIsWhite, gamesToGo) {
+
+    gameStatus = "waiting";
+    // $("#playerColour").prop('disabled', false);
+    if (gamesToGo > 0) {
+        stockfish.postMessage("ucinewgame");
+        chessGame.reset();
+        chessGame = new Chess();
+        // chessBoard.start();
+
+        boardScore = 0
+        $("#boardScore").text(boardScore);
+        // $("#playerColour").click();
+
+        if (stockfishIsWhite) {
+            window.setTimeout(aiMove, 500);
+        } else {
+            window.setTimeout(opponentMove, 500);
+        }
+
+        // if (stockfishIsWhite) {
+        // stockfishIsWhite = !stockfishIsWhite;
+        // }
+        // gamesToTest--;
+        // window.setTimeout(aiMove, 500);
+    }
+
+}
+
+function contactStockfish() {
+    $("#testingResults").text("Stockfish wins: NA out of " + gamesTested);
+    window.setTimeout(function () {
+        stockfish.postMessage("uci");
+        stockfish.postMessage("isready");
+        stockfish.postMessage('setoption name skill level value ' + $("#stockfish").val());
+        stockfish.postMessage("ucinewgame");
+        // stockfish.postMessage("position startpos");
+        // stockfish.postMessage("go depth 5");
+    }, 500);
+
+}
+function aiMove() {
+    var difficulty = $("#stockfish").val();
+    var stockfishDepth = $("#stockfishDepth").val();
+
+    window.setTimeout(function () {
+        stockfish.postMessage('setoption name skill level value ' + difficulty);
+        stockfish.postMessage("position startpos moves" + get_moves());
+        // stockfish.postMessage("position fen " + chessBoard.fen());
+        stockfish.postMessage("go depth " + stockfishDepth);
+    }, 600);
+}
+
+stockfish.onmessage = function (event) {
+    console.log(event.data);
+
+    var eventStr = event.data;
+    var match = eventStr.match(/^bestmove ([a-h][1-8])([a-h][1-8])([qrbn])?/);
+
+    if (match) {
+        console.log(match);
+        var move = chessGame.move({
+            from: match[1],
+            to: match[2],
+            promotion: match[3]
+        });
+
+        chessBoard.position(chessGame.fen());
+        var reset = updateGameStatus();
+
+        if (reset == "" && mode == "ai") {
+            window.setTimeout(opponentMove, 500);
+        }
+    }
+
+    // window.setTimeout(stockfishMove(event.data), 500);
+    // window.setTimeout(opponentMove, 500);   
+}
 
 //? Instantiate the chessboard + configuration
 var config = {
@@ -6,7 +125,8 @@ var config = {
     onDragStart: onDragStart,
     onDrop: onDrop,
     onSnapEnd: onSnapEnd,
-    showErrors: true
+    showErrors: true,
+    moveSpeed: "fast"
 }
 
 var gameStatus = "waiting";
@@ -103,8 +223,10 @@ function calculatePieceValue(piece) {
 
 //* AI ALGORITHM PROCESSING
 function opponentMove() {
+    var aiColour = $("#stockfishColour").text();
     // var playerColour = ($("#playerColour").is(":checked")) ? "B" : "W";
-    var minimax = (playerColour == "W") ? true : false;
+    // var minimax = (aiColour == "White") ? true : false;
+    // var minimax = (playerColour == "W") ? true : false;
 
     var startContemplate = new Date().getTime();
     var bestMove = minimaxAiMove(chessGame, true);
@@ -117,7 +239,13 @@ function opponentMove() {
     positionsEvaluated = 0;
 
     $("#timeEvaluation").text((endContemplate - startContemplate) + "s");
-    updateGameStatus();
+    var reset = updateGameStatus();
+    console.log(bestMove);
+
+    if (reset == "" && mode == "ai") {
+
+        window.setTimeout(aiMove, 500);
+    }
 }
 function minimaxAiMove(game, maximisingPlayer) {
 
@@ -125,12 +253,26 @@ function minimaxAiMove(game, maximisingPlayer) {
     var availableMoves = game.ugly_moves();
     var moveScore = -9999;
     var bestMove;
+    var alphaBetaActivated = $("#alphaBeta").is(":checked");
+    var minimaxActivated = $("#minimax").is(":checked");
+
+    if (!(alphaBetaActivated && minimaxActivated)) {
+        bestMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    }
 
     for (let i = 0; i < availableMoves.length; i++) {
 
         positionsEvaluated++;
         game.ugly_move(availableMoves[i]);
-        var currentMoveValue = minimaxAlgorithm(game, (depth - 1), -10000, 10000, !maximisingPlayer);
+
+        //* Using alpha-beta
+        if (alphaBetaActivated) {
+            var currentMoveValue = alphaBetaOptimised(game, (depth - 1), -10000, 10000, !maximisingPlayer);
+        } else if (minimaxActivated){
+            //TODO Change to minimax function name
+            var currentMoveValue = alphaBetaOptimised(game, (depth - 1), -10000, 10000, !maximisingPlayer);
+        } 
+
         // var currentMoveValue = -evaluateBoard(game);
         game.undo();
 
@@ -140,21 +282,33 @@ function minimaxAiMove(game, maximisingPlayer) {
             bestMove = availableMoves[i];
         }
     }
-    console.log(moveScore);
+    // console.log(moveScore);
 
     $("#boardScore").text(moveScore);
     return bestMove;
 }
 
 //? Minimax algorithm implementation with Alpha-Beta pruning
-function minimaxAlgorithm(game, depth, alpha, beta, maximisingPlayer) {
+function alphaBetaOptimised(game, depth, alpha, beta, maximisingPlayer) {
     positionsEvaluated++;
+    var aiColour = $("#stockfishColour").text();
+    var usePieceSquares = $("#pieceSquare").is(":checked");
 
     //Exit the loop when depth = 0 (meaning all branches and levels have been evaluated)
     if (depth == 0) {
-        // return -evaluateBoard(game);
-        return (playerColour == "W") ? -evaluateBoard(game) : evaluateBoard(game);
+        if (mode == "ai") {
+            if (usePieceSquares) {
+                return (aiColour == "White") ? -evaluate_board(chessGame.board()) : evaluate_board(chessGame.board());
+            }
+            return (aiColour == "White") ? -evaluateBoard(game) : evaluateBoard(game);
+        } else {
+            if (usePieceSquares) {
+                return (playerColour == "W") ? -evaluate_board(chessGame.board()) : evaluate_board(chessGame.board());
+            }
+            return (playerColour == "W") ? -evaluateBoard(game) : evaluateBoard(game);
+        }
     }
+
     var futureMoves = game.ugly_moves();
 
     if (maximisingPlayer) { //Evaluate Black (when AI = black) [Evaluate AI Moves]
@@ -163,7 +317,7 @@ function minimaxAlgorithm(game, depth, alpha, beta, maximisingPlayer) {
         for (let i = 0; i < futureMoves.length; i++) {
 
             game.ugly_move(futureMoves[i]);
-            score = Math.max(score, minimaxAlgorithm(game, (depth - 1), alpha, beta, !maximisingPlayer));
+            score = Math.max(score, alphaBetaOptimised(game, (depth - 1), alpha, beta, !maximisingPlayer));
             game.undo();
 
             alpha = Math.max(alpha, score);
@@ -179,7 +333,7 @@ function minimaxAlgorithm(game, depth, alpha, beta, maximisingPlayer) {
         for (let i = 0; i < futureMoves.length; i++) {
 
             game.ugly_move(futureMoves[i]);
-            score = Math.min(score, minimaxAlgorithm(game, (depth - 1), alpha, beta, !maximisingPlayer));
+            score = Math.min(score, alphaBetaOptimised(game, (depth - 1), alpha, beta, !maximisingPlayer));
             game.undo();
 
             beta = Math.min(beta, score);
@@ -226,8 +380,13 @@ function onDrop(source, target) {
 
     //Update game status
     updateGameStatus();
+    if ($("#activateAi").is(":checked")) {
 
-    window.setTimeout(opponentMove, 250);
+        window.setTimeout(aiMove, 250);
+    } else {
+
+        window.setTimeout(opponentMove, 250);
+    }
 
 }
 
@@ -237,16 +396,56 @@ function onSnapEnd() {
     chessBoard.position(chessGame.fen());
 }
 
-//? Checks the game status
-function updateGameStatus() {
+//? Update the total test counter
+function updateTestCount() {
+    gamesTested = $("#gameTest").val();
+    $("#testingResults").text("Stockfish wins: NA out of " + gamesTested);
+}
 
+//? Checks the game status
+var stockWon = 0;
+var gamesTested = $("#gameTest").val();
+function updateGameStatus() {
+    // console.log(chessGame.turn())
     gameStatus = "playing";
 
-    if (chessGame.in_checkmate()) {
-        alert("Checkmate! Game has ended");
-    } else if (chessGame.in_stalemate()) {
-        alert("Stalemate! Game has ended");
-    } else if (chessGame.in_draw()) {
-        alert("Draw! Game has ended");
+    if (mode == "human") {
+        if (chessGame.in_checkmate()) {
+            alert("Checkmate! Game has ended");
+        } else if (chessGame.in_stalemate()) {
+            alert("Stalemate! Game has ended");
+        } else if (chessGame.in_draw()) {
+            alert("Draw! Game has ended");
+        }
     }
+
+    if (mode == "ai") {
+        if (chessGame.game_over()) {
+            var stockfishIsWhite = ($("#stockfishColour").text() == "White") ? true : false;
+            var gamesLeft = $("#gameTest").val();
+
+            console.log(chessGame.turn());
+
+            if (chessGame.turn() == "b" && stockfishIsWhite) {
+                stockWon = stockWon + 1;
+            } else if (chessGame.turn() == "w" && !stockfishIsWhite) {
+                stockWon = stockWon + 1;
+            }
+
+            if (gamesLeft > 0) {
+                testingReset(!stockfishIsWhite, gamesLeft - 1);
+                (stockfishIsWhite) ? $("#stockfishColour").text("Black") : $("#stockfishColour").text("White");
+                $("#gameTest").val(gamesLeft - 1);
+                $("#testingResults").text("Stockfish wins: " + stockWon + " out of " + gamesTested);
+                $("#testingTime").html($("#testingTime").text() + "<br>Game " + gamesLeft + ": " + (new Date().getTime() - startTest) + "s");
+
+                startTest = new Date().getTime();
+                // console.log(gamesToTest);
+            }
+            // gamesToTest--;
+
+            return "testingReset";
+        }
+    }
+    return "";
 }
