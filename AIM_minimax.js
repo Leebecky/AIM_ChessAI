@@ -18,14 +18,19 @@ var minimaxBase = function(depth, game, isMaximisingPlayer) {
 };
 
 var minimax = function (depth, game, isMaximisingPlayer) {
-    positionCount++;
+    positionsEvaluated++;
     if (depth == 0) {
-        if(playerColour == "W"){
-            return -evaluateBoard(game.board());
-        }else{
-            return evaluateBoard(game.board());
+        if (mode == "ai") {
+            if (usePieceSquares) {
+                return (aiColour == "White") ? -evaluate_board(chessGame.board()) : evaluate_board(chessGame.board());
+            }
+            return (aiColour == "White") ? -evaluateBoard(game) : evaluateBoard(game);
+        } else {
+            if (usePieceSquares) {
+                return (playerColour == "W") ? -evaluate_board(chessGame.board()) : evaluate_board(chessGame.board());
+            }
+            return (playerColour == "W") ? -evaluateBoard(game) : evaluateBoard(game);
         }
-        
     }
 
     var possibleGameMoves = game.ugly_moves();
