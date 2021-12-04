@@ -268,10 +268,10 @@ function minimaxAiMove(game, maximisingPlayer) {
         //* Using alpha-beta
         if (alphaBetaActivated) {
             var currentMoveValue = alphaBetaOptimised(game, (depth - 1), -10000, 10000, !maximisingPlayer);
-        } else if (minimaxActivated){
+        } else if (minimaxActivated) {
             //TODO Change to minimax function name
             var currentMoveValue = alphaBetaOptimised(game, (depth - 1), -10000, 10000, !maximisingPlayer);
-        } 
+        }
 
         // var currentMoveValue = -evaluateBoard(game);
         game.undo();
@@ -404,6 +404,8 @@ function updateTestCount() {
 
 //? Checks the game status
 var stockWon = 0;
+var apuAiBlack = 0;
+var apuAiWhite = 0;
 var gamesTested = $("#gameTest").val();
 function updateGameStatus() {
     // console.log(chessGame.turn())
@@ -425,19 +427,26 @@ function updateGameStatus() {
 
             if (chessGame.in_checkmate() == true && chessGame.turn() == "b") {
                 loser = "black";
-            }  else if (chessGame.in_checkmate() == true && chessGame.turn() == "w") {
+            } else if (chessGame.in_checkmate() == true && chessGame.turn() == "w") {
                 loser = "white";
             }
 
             var stockfishIsWhite = ($("#stockfishColour").text() == "White") ? true : false;
             var gamesLeft = $("#gameTest").val();
-alert(stockfishIsWhite);
+            // alert(loser);
             console.log(chessGame.turn());
 
+            //Stockfish wins
             if (loser == "black" && stockfishIsWhite) {
                 stockWon = stockWon + 1;
             } else if (loser == "white" && !stockfishIsWhite) {
                 stockWon = stockWon + 1;
+            } else { //Apu AI wins
+                if (stockfishIsWhite) {
+                    apuAiBlack = apuAiBlack + 1;
+                } else {
+                    apuAiWhite = apuAiWhite + 1;
+                }
             }
 
             if (gamesLeft > 0) {
@@ -445,6 +454,7 @@ alert(stockfishIsWhite);
                 (stockfishIsWhite) ? $("#stockfishColour").text("Black") : $("#stockfishColour").text("White");
                 $("#gameTest").val(gamesLeft - 1);
                 $("#testingResults").text("Stockfish wins: " + stockWon + " out of " + gamesTested);
+                $("#testingResultsApuAi").text("APU AI wins: Black = " + apuAiBlack + " | White = " + apuAiWhite);
                 $("#testingTime").html($("#testingTime").text() + "<br>Game " + gamesLeft + ": " + (new Date().getTime() - startTest) + "s");
 
                 startTest = new Date().getTime();
