@@ -20,8 +20,10 @@ function get_moves() {
     return moves;
 }
 
-// var gamesToTest = 2;
+// var gamesToTest = $("#gameTest").val();
+
 function testing() {
+    updateTestCount();
     startTest = new Date().getTime();
     mode = "ai";
     // var difficulty = $("#stockfish").val();
@@ -270,7 +272,7 @@ function minimaxAiMove(game, maximisingPlayer) {
             var currentMoveValue = alphaBetaOptimised(game, (depth - 1), -10000, 10000, !maximisingPlayer);
         } else if (minimaxActivated){
             //TODO Change to minimax function name
-            var currentMoveValue = alphaBetaOptimised(game, (depth - 1), -10000, 10000, !maximisingPlayer);
+            var currentMoveValue = minimax((depth - 1), game, !maximisingPlayer);
         } 
 
         // var currentMoveValue = -evaluateBoard(game);
@@ -348,6 +350,47 @@ function alphaBetaOptimised(game, depth, alpha, beta, maximisingPlayer) {
 
 }
 
+//? Minimax algorithm implementation without Alpha-Beta pruning
+function minimax(depth, game, isMaximisingPlayer) {
+    positionsEvaluated++;
+    var aiColour = $("#stockfishColour").text();
+    var usePieceSquares = $("#pieceSquare").is(":checked");
+
+    if (depth == 0) {
+        if (mode == "ai") {
+            if (usePieceSquares) {
+                return (aiColour == "White") ? -evaluate_board(chessGame.board()) : evaluate_board(chessGame.board());
+            }
+            return (aiColour == "White") ? -evaluateBoard(game) : evaluateBoard(game);
+        } else {
+            if (usePieceSquares) {
+                return (playerColour == "W") ? -evaluate_board(chessGame.board()) : evaluate_board(chessGame.board());
+            }
+            return (playerColour == "W") ? -evaluateBoard(game) : evaluateBoard(game);
+        }
+    }
+
+    var possibleGameMoves = game.ugly_moves();
+
+    if (isMaximisingPlayer) {
+        var currentBestMove = -9999;
+        
+        for (var i = 0; i < possibleGameMoves.length; i++) {
+            game.ugly_move(possibleGameMoves[i]);
+            currentBestMove = Math.max(currentBestMove, minimax(depth - 1, game, !isMaximisingPlayer));
+            game.undo();
+        }
+        return currentBestMove;
+    } else {
+        var currentBestMove = 9999;
+        for (var i = 0; i < possibleGameMoves.length; i++) {
+            game.ugly_move(possibleGameMoves[i]);
+            currentBestMove = Math.min(currentBestMove, minimax(depth - 1, game, !isMaximisingPlayer));
+            game.undo();
+        }
+        return currentBestMove;
+    }
+}
 
 //* CHESSBOARD FUNCTIONS
 function onDragStart(source, piece, position, orientation) {
@@ -405,6 +448,7 @@ function updateTestCount() {
 //? Checks the game status
 var stockWon = 0;
 var gamesTested = $("#gameTest").val();
+
 function updateGameStatus() {
     // console.log(chessGame.turn())
     gameStatus = "playing";
@@ -440,9 +484,10 @@ function updateGameStatus() {
                 $("#testingTime").html($("#testingTime").text() + "<br>Game " + gamesLeft + ": " + (new Date().getTime() - startTest) + "s");
 
                 startTest = new Date().getTime();
-                // console.log(gamesToTest);
+                //console.log("gamesCount: " + gamesCount);
             }
-            // gamesToTest--;
+            
+            //gamesCount++;
 
             return "testingReset";
         }

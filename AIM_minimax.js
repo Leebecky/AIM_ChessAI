@@ -19,6 +19,9 @@ var minimaxBase = function(depth, game, isMaximisingPlayer) {
 
 var minimax = function (depth, game, isMaximisingPlayer) {
     positionsEvaluated++;
+    var aiColour = $("#stockfishColour").text();
+    var usePieceSquares = $("#pieceSquare").is(":checked");
+
     if (depth == 0) {
         if (mode == "ai") {
             if (usePieceSquares) {
@@ -37,6 +40,7 @@ var minimax = function (depth, game, isMaximisingPlayer) {
 
     if (isMaximisingPlayer) {
         var currentBestMove = -9999;
+        
         for (var i = 0; i < possibleGameMoves.length; i++) {
             game.ugly_move(possibleGameMoves[i]);
             currentBestMove = Math.max(currentBestMove, minimax(depth - 1, game, !isMaximisingPlayer));
