@@ -465,14 +465,22 @@ function updateGameStatus() {
 
     if (mode == "ai") {
         if (chessGame.game_over()) {
+            var loser;
+
+            if (chessGame.in_checkmate() == true && chessGame.turn() == "b") {
+                loser = "black";
+            }  else if (chessGame.in_checkmate() == true && chessGame.turn() == "w") {
+                loser = "white";
+            }
+
             var stockfishIsWhite = ($("#stockfishColour").text() == "White") ? true : false;
             var gamesLeft = $("#gameTest").val();
-
+alert(stockfishIsWhite);
             console.log(chessGame.turn());
 
-            if (chessGame.turn() == "b" && stockfishIsWhite) {
+            if (loser == "black" && stockfishIsWhite) {
                 stockWon = stockWon + 1;
-            } else if (chessGame.turn() == "w" && !stockfishIsWhite) {
+            } else if (loser == "white" && !stockfishIsWhite) {
                 stockWon = stockWon + 1;
             }
 
