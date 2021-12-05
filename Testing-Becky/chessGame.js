@@ -475,7 +475,7 @@ function updateGameStatus() {
 
             var stockfishIsWhite = ($("#stockfishColour").text() == "White") ? true : false;
             var gamesLeft = $("#gameTest").val();
-alert(stockfishIsWhite);
+alert("loser : "+ loser);
             console.log(chessGame.turn());
 
             if (loser == "black" && stockfishIsWhite) {
