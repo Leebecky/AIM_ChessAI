@@ -12,83 +12,90 @@
     <div id="chessboard" style="width: 400px"></div>
 
     <!-- Game Options -->
-    <div id="gameOptions"><br>
-        <input type="checkbox" id="playerColour" onclick="updateGameOptions()">
-        <label for="playerColour">Play as Black<label for="playerColour"></label>
-            <br><br>
-            <input type="checkbox" id="minimax" checked="true"><label for="minimax">Activate Minimax Algorithm</label>
-            <br><br>
-            <input type="checkbox" id="alphaBeta" checked="true"><label for="alphaBeta">Activate Alpha-Beta Optimisation</label>
-            <br><br>
-            <input type="checkbox" id="pieceSquare" checked="true"><label for="pieceSquare">Activate Piece-Squares</label>
-            <br><br>
-            <input type="checkbox" id="activateAi"><label for="activateAi"> Play against Stockfish</label>
-            <br><br>
-            <button onclick="resetGame()">Restart</button>
-            <br> <br>
-            Algorithm Depth
-            <select name="depth" id="depth">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3" selected>3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-            </select>
-    </div>
-    <br>
     <div>
-        Board Value: <span id="boardScore">0</span><br>
-        Moves Evaluated: <span id="moveEvaluation">0</span><br>
-        Time Spent Evaluating: <span id="timeEvaluation">0</span>
-    </div>
-    <br>
-    <div>
-        <!-- <select name="stockfish" id="stockfish">
-        <option value="W">White</option>
-        <option value="B">Black</option>
-    </select> -->
-        <h2>Stockfish</h2>Difficulty Level
-        <select name="stockfish" id="stockfish">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3" selected>3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-            <option value="13">13</option>
-            <option value="14">14</option>
-            <option value="15">15</option>
-            <option value="16">16</option>
-            <option value="17">17</option>
-            <option value="18">18</option>
-            <option value="19">19</option>
-            <option value="20">20</option>
-        </select>
+        <div id="gameOptions" style = "float:left; width:400px"><br>
+            <input type="checkbox" id="playerColour" onclick="updateGameOptions()">
+            <label for="playerColour">Play as Black<label for="playerColour"></label>
+                <br><br>
+                <input type="checkbox" id="minimax" checked="true"><label for="minimax">Activate Minimax Algorithm</label>
+                <br><br>
+                <input type="checkbox" id="alphaBeta" checked="true"><label for="alphaBeta">Activate Alpha-Beta Optimisation</label>
+                <br><br>
+                <input type="checkbox" id="pieceSquare" checked="true"><label for="pieceSquare">Activate Piece-Squares</label>
+                <br><br>
+                <input type="checkbox" id="activateAi"><label for="activateAi"> Play against Stockfish</label>
+                <br><br>
+                <button onclick="resetGame()">Restart</button>
+                <br> <br>
+                Algorithm Depth
+                <select name="depth" id="depth">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+        </div>
         <br>
-        Stockfish Depth
-        <select name="stockfishDepth" id="stockfishDepth">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3" selected>3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-        </select>
-        <br>
-        Games to Test
-        <input type="number" id="gameTest" value="10" onclick="updateTestCount()">
+
+        <div style = "margin: 0 auto">
+            <div>
+                Board Value: <span id="boardScore">0</span><br>
+                Moves Evaluated: <span id="moveEvaluation">0</span><br>
+                Time Spent Evaluating: <span id="timeEvaluation">0</span>
+            </div>
+            <br>
+            <div>
+                <!-- <select name="stockfish" id="stockfish">
+                <option value="W">White</option>
+                <option value="B">Black</option>
+            </select> -->
+                <h2>Stockfish</h2>Difficulty Level
+                <select name="stockfish" id="stockfish">
+                    <option value="0" selected>0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                    <option value="20">20</option>
+                </select>
+                <br>
+                Stockfish Depth
+                <select name="stockfishDepth" id="stockfishDepth">
+                    <option value="0" selected>0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" >3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+                <br>
+                Games to Test
+                <input type="number" id="gameTest" value="10" onclick="updateTestCount()">
 
 
-        <button onclick="testing()">Start Testing</button><br>
-        Stockfish Colour: <span id="stockfishColour">White</span><br>
-        <!-- Games Left: <span id="gameTest">3</span><br> -->
-        Testing Log: <span id="testingResults"></span><br>
-        Testing Time: <span id="testingTime"></span>
+                <button onclick="testing()">Start Testing</button><br>
+                Stockfish Colour: <span id="stockfishColour">White</span><br>
+                <!-- Games Left: <span id="gameTest">3</span><br> -->
+                Testing Log: <span id="testingResults"></span><br>
+                Testing Time: <span id="testingTime"></span>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->
@@ -96,7 +103,7 @@
     <script src="lib/chessboardjs/js/chess.js"></script>
     <script src="lib/chessboardjs/js/chessboard-0.3.0.js"></script>
     <script src="chessGame.js"></script>
-    <script src="../AIM_piece_square.js"></script>
+    <script src="AIM_piece_square.js"></script>
 </body>
 
 </html>
